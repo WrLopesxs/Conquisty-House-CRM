@@ -1,0 +1,503 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard · Conquist House CRM</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+
+  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" href="assets/dashboard.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-left">
+        <img src="assets/logo.svg" alt="Conquist House" />
+        <strong>Conquist House CRM</strong>
+        <span id="corretorBadge" class="badge corretor-nome" style="background:var(--accent-glass);color:var(--accent-dark);">Ativo</span>
+      </div>
+      <div class="topbar-right">
+        <span id="updatedAt" class="mono" style="font-size:0.75rem;color:var(--text-secondary);"></span>
+        <a id="btnSheet" class="btn btn-sm btn-outline-accent" href="#" target="_blank" rel="noopener noreferrer" hidden><i class="ph ph-table"></i> Planilha</a>
+        <a class="btn btn-sm" href="index.html"><i class="ph ph-arrow-left"></i> Trocar Corretor</a>
+        <button id="btnExport" class="btn btn-sm btn-outline-accent" type="button"><i class="ph ph-file-pdf"></i> Exportar PDF</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="pdfTarget" class="page">
+    <section id="stateBox" class="card section" data-aos="fade-up">
+      <div class="skeleton" style="height:20px;width:180px;"></div>
+      <div class="skeleton" style="height:14px;width:280px;margin-top:8px;"></div>
+    </section>
+
+    <section id="dashboardContent" hidden>
+      <section id="ownerPanel" class="owner-panel" hidden data-aos="fade-up">
+        <h3>Painel de Gestão</h3>
+        <div class="owner-filters">
+          <select id="ownerCorretorSelect" class="select">
+            <option value="">Todos os corretores</option>
+          </select>
+          <select id="ownerPeriodoSelect" class="select">
+            <option value="">Período completo</option>
+            <option value="30">Últimos 30 dias</option>
+            <option value="90">Últimos 90 dias</option>
+            <option value="180">Últimos 180 dias</option>
+          </select>
+          <select id="ownerStatusSelect" class="select">
+            <option value="">Todas as etapas</option>
+            <option value="Lead">Lead</option>
+            <option value="Contato">Contato</option>
+            <option value="Visita">Visita</option>
+            <option value="Proposta">Proposta</option>
+            <option value="Venda">Venda</option>
+            <option value="Perdido">Perdido</option>
+          </select>
+          <button id="ownerResetBtn" class="btn btn-sm btn-outline-accent" type="button">Limpar filtros</button>
+        </div>
+        <div id="ownerSummary" class="owner-summary"></div>
+      </section>
+
+      <div class="kpi-grid" id="kpiGrid"></div>
+
+      <div class="layout-grid" style="margin-top:16px;">
+        <section class="card section" data-aos="fade-up">
+          <h2>Funil de Vendas</h2>
+          <div class="chart-wrap"><canvas id="funnelChart"></canvas></div>
+        </section>
+        <section class="card section" data-aos="fade-up" data-aos-delay="80">
+          <h2>Métricas de Conversão</h2>
+          <div class="progress-list" id="conversionList"></div>
+        </section>
+      </div>
+
+      <div class="layout-grid">
+        <section class="card section" data-aos="fade-up">
+          <h2>Origem dos Leads</h2>
+          <div class="chart-wrap"><canvas id="origemChart"></canvas></div>
+        </section>
+        <section class="card section" data-aos="fade-up" data-aos-delay="80">
+          <h2>Leads por Mês</h2>
+          <div class="chart-wrap"><canvas id="mesChart"></canvas></div>
+        </section>
+      </div>
+
+      <section class="card section" data-aos="fade-up">
+        <h2>Status dos Contatos</h2>
+        <div class="chart-wrap"><canvas id="statusChart"></canvas></div>
+      </section>
+
+      <section id="ownerRankingSection" class="card section" hidden data-aos="fade-up">
+        <h2>Ranking de Corretores</h2>
+        <div class="table-shell">
+          <table class="owner-ranking-table">
+            <thead>
+              <tr>
+                <th>Corretor</th>
+                <th>Total Leads</th>
+                <th>Vendas</th>
+                <th>Conversão (%)</th>
+                <th>Ticket Médio</th>
+              </tr>
+            </thead>
+            <tbody id="ownerRankingBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card section" data-aos="fade-left">
+        <h2>Alertas Inteligentes</h2>
+        <div id="alertList" class="alert-list"></div>
+      </section>
+
+      <section class="card section" data-aos="fade-up">
+        <h2>Tabela de Leads</h2>
+        <div class="filters">
+          <input id="searchInput" class="input" placeholder="Buscar cliente ou imóvel" />
+          <select id="statusFilter" class="select"><option value="">Status</option></select>
+          <select id="origemFilter" class="select"><option value="">Origem</option></select>
+          <select id="corretorFilter" class="select" hidden><option value="">Corretor</option></select>
+          <input id="minValor" class="input" type="number" min="0" placeholder="Valor mín." />
+          <input id="maxValor" class="input" type="number" min="0" placeholder="Valor máx." />
+        </div>
+
+        <div class="table-shell">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th data-sort="cliente">Cliente</th>
+                <th data-sort="imovel">Imóvel</th>
+                <th data-sort="dataLead">Data do Lead</th>
+                <th data-sort="origemLead">Origem</th>
+                <th>Status Atual</th>
+                <th data-sort="valorImovel">Valor do Imóvel</th>
+                <th data-sort="statusContato">Situação</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination">
+          <div>
+            <label style="font-size:12px;color:var(--text-muted)">Itens</label>
+            <select id="perPage" class="select" style="width:80px;display:inline-block;">
+              <option value="20" selected>20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+          <div class="topbar-right">
+            <button id="prevPage" class="btn btn-sm" type="button">Anterior</button>
+            <span id="pageInfo" class="mono"></span>
+            <button id="nextPage" class="btn btn-sm" type="button">Próxima</button>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script type="module">
+    import { fetchCorretorData, prepararDados, temContato, temVisita, temProposta, isSim, isNao, calcularStatus } from "./js/api.js";
+    import { renderCharts } from "./js/charts.js";
+    import { buildAlerts, renderAlerts } from "./js/alerts.js";
+    import { createTableController } from "./js/table.js";
+    import { exportDashboardPDF } from "./js/export.js";
+
+    const OWNER_USERS = new Set(["renata", "josias"]);
+    const TEAM_BROKERS = ["Renata", "Alisom", "Gisele", "Juliane", "Kener", "Clovis", "Thaize", "Tiago", "Carla"];
+    const SHEET_URLS = {
+      renata: "https://docs.google.com/spreadsheets/d/1tHgwYV3Icx4px0mUL44IvMgyQIMTTFT6xSbxXRG_dfY/edit?usp=sharing",
+      alisom: "https://docs.google.com/spreadsheets/d/1bSTV3d7Ha12Yix8mRuAm2Aro8O85Yy3GyvojUAuwHJg/edit?usp=sharing",
+      gisele: "https://docs.google.com/spreadsheets/d/1qxPvaSfhhZ1Q5ut8llaMbexd8ukhSI4Cp2mbmqXW4DQ/edit?usp=sharing",
+      juliane: "https://docs.google.com/spreadsheets/d/1i9FrHVrbzBUqcQ0cjP4zULOM3Guhy1FiHN7M18wu_m4/edit?usp=sharing",
+      kener: "https://docs.google.com/spreadsheets/d/1aNpPHHoCcXXO6AeTzOYxgu2ZXBWCE6t22N2p6jqikZI/edit?usp=sharing",
+      clovis: "https://docs.google.com/spreadsheets/d/1MDBPQ9AdS9pNFdhpaoQp2sXOIRB79_2leiqnhOqIrXk/edit?usp=sharing",
+      thaize: "https://docs.google.com/spreadsheets/d/1F1E-zN5Mc9oENMLsVD_Esiha2m_MWQ7Wst32pJRd8Yg/edit?usp=sharing",
+      tiago: "https://docs.google.com/spreadsheets/d/1g7KsgRPRWr23c09d-HuuqHxNoRTzxRMCrWPJWXv9AZo/edit?usp=sharing",
+      carla: "https://docs.google.com/spreadsheets/d/1OtBK2panrcPuHgPubn5as39enBB4b9xuLKyHfCm5H24/edit?usp=sharing"
+    };
+
+    const params = new URLSearchParams(location.search);
+    const corretor = params.get("corretor") || "Corretor";
+    const view = params.get("view") || "broker";
+    const authRaw = sessionStorage.getItem("conquist_auth");
+    const corretorFilterEl = document.getElementById("corretorFilter");
+    const isOwnerView = view === "owner";
+
+    const isAuthorized = () => {
+      if (!authRaw) return false;
+      try {
+        const auth = JSON.parse(authRaw);
+        if (!auth || !auth.corretor || !auth.expiresAt) return false;
+        if (Date.now() > Number(auth.expiresAt)) return false;
+        const authCorretor = auth.corretor.toString().toLowerCase();
+        const authRole = auth.role || (OWNER_USERS.has(authCorretor) ? "owner" : "broker");
+        if (isOwnerView) return authRole === "owner";
+        return authCorretor === corretor.toString().toLowerCase();
+      } catch (_) {
+        return false;
+      }
+    };
+
+    if (!isAuthorized()) {
+      window.location.href = "index.html?auth=required";
+    }
+
+    const fmtMoeda = (n) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+    const percColor = (v) => v < 20 ? "#2D6A4F" : v <= 40 ? "#9A7A2E" : "#9B2335";
+
+    const stateBox = document.getElementById("stateBox");
+    const content = document.getElementById("dashboardContent");
+    const badge = document.getElementById("corretorBadge");
+    const updatedAt = document.getElementById("updatedAt");
+    const kpiGrid = document.getElementById("kpiGrid");
+    const ownerPanel = document.getElementById("ownerPanel");
+    const ownerRankingSection = document.getElementById("ownerRankingSection");
+    const ownerSummary = document.getElementById("ownerSummary");
+    const ownerCorretorSelect = document.getElementById("ownerCorretorSelect");
+    const ownerPeriodoSelect = document.getElementById("ownerPeriodoSelect");
+    const ownerStatusSelect = document.getElementById("ownerStatusSelect");
+    const ownerResetBtn = document.getElementById("ownerResetBtn");
+    const ownerRankingBody = document.getElementById("ownerRankingBody");
+    const btnSheet = document.getElementById("btnSheet");
+
+    const sheetUrl = SHEET_URLS[corretor.toLowerCase()];
+    if (sheetUrl) {
+      btnSheet.href = sheetUrl;
+      btnSheet.hidden = false;
+    } else {
+      btnSheet.hidden = true;
+    }
+
+    let tableController = null;
+
+    const calcKpis = (dados) => {
+      const total = dados.length;
+      const contatos = dados.filter((l) => temContato(l)).length;
+      const visitas = dados.filter((l) => temVisita(l)).length;
+      const propostas = dados.filter((l) => temProposta(l)).length;
+      const vendas = dados.filter((l) => isSim(l.teveVenda));
+      const perdidos = dados.filter((l) => isNao(l.teveVenda)).length;
+      const ticket = vendas.length ? vendas.reduce((sum, l) => sum + l.valorImovel, 0) / vendas.length : 0;
+      const taxaPerda = total ? Number(((perdidos / total) * 100).toFixed(1)) : 0;
+      return {
+        total,
+        contatos,
+        visitas,
+        propostas,
+        vendas: vendas.length,
+        perdidos,
+        ticket,
+        taxaPerda
+      };
+    };
+
+    const drawKpis = (k) => {
+      kpiGrid.innerHTML = [
+        ["Total de Leads", k.total],
+        ["Contatos Realizados", k.contatos],
+        ["Visitas Realizadas", k.visitas],
+        ["Propostas Enviadas", k.propostas],
+        ["Vendas Fechadas", k.vendas],
+        ["Leads Perdidos", k.perdidos],
+        ["Ticket Médio", fmtMoeda(k.ticket)],
+        ["Taxa de Perda", `<span style=\"color:${percColor(k.taxaPerda)}\">${k.taxaPerda.toLocaleString("pt-BR")}%</span>`]
+      ].map(([label, val], i) => `
+        <article class="card kpi" data-aos="fade-up" data-aos-delay="${i * 45}">
+          <div class="kpi-label">${label}</div>
+          <div class="kpi-value mono">${val}</div>
+        </article>
+      `).join("");
+      AOS.refreshHard();
+    };
+
+    const drawConversions = (f) => {
+      const rate = (a, b) => b > 0 ? Math.round((a / b) * 100) : 0;
+      const rows = [
+        ["Lead -> Contato", rate(f.contato, f.total)],
+        ["Contato -> Visita", rate(f.visita, f.contato)],
+        ["Visita -> Proposta", rate(f.proposta, f.visita)],
+        ["Proposta -> Venda", rate(f.venda, f.proposta)]
+      ];
+      document.getElementById("conversionList").innerHTML = rows.map(([label, val]) => `
+        <div class="progress-row">
+          <div>
+            <div style="font-size:13px; font-family:var(--font-body);">${label}</div>
+            <div class="bar" aria-hidden="true"><span style="width:${val}%"></span></div>
+          </div>
+          <strong class="mono">${val}%</strong>
+        </div>
+      `).join("");
+    };
+
+    const showError = () => {
+      stateBox.innerHTML = '<div class="error">Não foi possível carregar os dados agora. <button id="retry" class="btn" type="button">Tentar novamente</button></div>';
+      document.getElementById("retry").addEventListener("click", () => location.reload());
+    };
+
+    const loadOwnerDataset = async () => {
+      const settled = await Promise.allSettled(TEAM_BROKERS.map(async (nome) => {
+        const raw = await fetchCorretorData(nome);
+        const payload = prepararDados(raw);
+        const dados = (payload.dados || []).map((lead) => ({ ...lead, corretor: lead.corretor || nome }));
+        return { nome, payload, dados };
+      }));
+
+      const ok = settled.filter((r) => r.status === "fulfilled").map((r) => r.value);
+      const dados = ok.flatMap((r) => r.dados);
+      const atualizadoEm = new Date().toISOString();
+      return {
+        corretor: "Relatório Geral",
+        atualizadoEm,
+        dados
+      };
+    };
+
+    const applyOwnerFilters = (dadosBase) => {
+      const corretorSel = ownerCorretorSelect.value;
+      const periodoSel = Number(ownerPeriodoSelect.value || 0);
+      const statusSel = ownerStatusSelect.value;
+      const hoje = new Date();
+
+      return dadosBase.filter((lead) => {
+        if (corretorSel && lead.corretor !== corretorSel) return false;
+        if (statusSel && calcularStatus(lead) !== statusSel) return false;
+        if (periodoSel > 0) {
+          if (!lead.dataLead) return false;
+          const d = new Date(`${lead.dataLead}T00:00:00`);
+          if (Number.isNaN(d.getTime())) return false;
+          const diff = Math.floor((hoje - d) / (1000 * 60 * 60 * 24));
+          if (diff > periodoSel) return false;
+        }
+        return true;
+      });
+    };
+
+    const drawOwnerSummary = (dados) => {
+      const corretoresAtivos = new Set(dados.map((d) => d.corretor).filter(Boolean)).size;
+      const vendas = dados.filter((l) => isSim(l.teveVenda)).length;
+      const taxaVenda = dados.length ? ((vendas / dados.length) * 100).toFixed(1) : "0.0";
+      const ticketVals = dados.filter((l) => isSim(l.teveVenda) && l.valorImovel > 0).map((l) => l.valorImovel);
+      const ticketMedio = ticketVals.length ? ticketVals.reduce((a, b) => a + b, 0) / ticketVals.length : 0;
+      const mediaLeads = corretoresAtivos ? (dados.length / corretoresAtivos).toFixed(1) : "0.0";
+
+      ownerSummary.innerHTML = [
+        ["Corretores Ativos", corretoresAtivos],
+        ["Leads por Corretor", mediaLeads],
+        ["Taxa Geral de Venda", `${taxaVenda}%`],
+        ["Ticket Médio Geral", fmtMoeda(ticketMedio)]
+      ].map(([label, value]) => `
+        <article class="owner-summary-card">
+          <div class="label">${label}</div>
+          <div class="value">${value}</div>
+        </article>
+      `).join("");
+    };
+
+    const drawOwnerRanking = (dados) => {
+      const grouped = dados.reduce((acc, lead) => {
+        const key = lead.corretor || "Nao informado";
+        if (!acc[key]) acc[key] = { leads: 0, vendas: 0, valorVendas: 0 };
+        acc[key].leads += 1;
+        if (isSim(lead.teveVenda)) {
+          acc[key].vendas += 1;
+          acc[key].valorVendas += Number(lead.valorImovel || 0);
+        }
+        return acc;
+      }, {});
+
+      const rows = Object.entries(grouped)
+        .map(([nome, d]) => {
+          const conv = d.leads ? ((d.vendas / d.leads) * 100) : 0;
+          const ticket = d.vendas ? d.valorVendas / d.vendas : 0;
+          return { nome, leads: d.leads, vendas: d.vendas, conv, ticket };
+        })
+        .sort((a, b) => b.vendas - a.vendas || b.conv - a.conv);
+
+      ownerRankingBody.innerHTML = rows.map((r) => `
+        <tr>
+          <td>${r.nome}</td>
+          <td class="mono">${r.leads}</td>
+          <td class="mono">${r.vendas}</td>
+          <td class="mono">${r.conv.toFixed(1)}%</td>
+          <td class="mono">${fmtMoeda(r.ticket)}</td>
+        </tr>
+      `).join("");
+    };
+
+    const mountTable = (dados, ownerMode) => {
+      const refs = {
+        search: document.getElementById("searchInput"),
+        status: document.getElementById("statusFilter"),
+        origem: document.getElementById("origemFilter"),
+        corretor: ownerMode ? corretorFilterEl : null,
+        minValor: document.getElementById("minValor"),
+        maxValor: document.getElementById("maxValor"),
+        tbody: document.getElementById("tableBody"),
+        pageInfo: document.getElementById("pageInfo"),
+        prev: document.getElementById("prevPage"),
+        next: document.getElementById("nextPage"),
+        perPage: document.getElementById("perPage"),
+        headings: [...document.querySelectorAll("thead th")]
+      };
+      if (!tableController) {
+        tableController = createTableController(dados, refs);
+      } else {
+        tableController.setData(dados);
+      }
+    };
+
+    const renderAll = (dados, ownerMode) => {
+      const kpis = calcKpis(dados);
+      drawKpis(kpis);
+      const funnel = renderCharts(dados);
+      drawConversions(funnel);
+      renderAlerts(document.getElementById("alertList"), buildAlerts(dados));
+      mountTable(dados, ownerMode);
+      if (ownerMode) {
+        drawOwnerSummary(dados);
+        drawOwnerRanking(dados);
+      }
+    };
+
+    async function init() {
+      try {
+        const payload = isOwnerView ? await loadOwnerDataset() : prepararDados(await fetchCorretorData(corretor));
+        const dados = payload.dados || [];
+
+        if (!dados.length) {
+          stateBox.innerHTML = '<div class="empty">Nenhum lead encontrado para este corretor.</div>';
+          return;
+        }
+
+        if (isOwnerView) {
+          badge.textContent = `${corretor} · Gestão`;
+          corretorFilterEl.hidden = false;
+          ownerPanel.hidden = false;
+          ownerRankingSection.hidden = false;
+        } else {
+          badge.textContent = `${corretor} · Ativo`;
+          corretorFilterEl.hidden = true;
+          ownerPanel.hidden = true;
+          ownerRankingSection.hidden = true;
+        }
+
+        updatedAt.textContent = `Atualizado: ${new Date(payload.atualizadoEm).toLocaleString("pt-BR")}`;
+
+        stateBox.hidden = true;
+        content.hidden = false;
+
+        let activeData = dados;
+        if (isOwnerView) {
+          const corretores = [...new Set(dados.map((d) => d.corretor).filter(Boolean))].sort();
+          ownerCorretorSelect.innerHTML = '<option value="">Todos os corretores</option>' + corretores.map((c) => `<option value="${c}">${c}</option>`).join("");
+          const rerenderOwner = () => {
+            activeData = applyOwnerFilters(dados);
+            renderAll(activeData, true);
+          };
+          [ownerCorretorSelect, ownerPeriodoSelect, ownerStatusSelect].forEach((el) => {
+            el.addEventListener("change", rerenderOwner);
+          });
+          ownerResetBtn.addEventListener("click", () => {
+            ownerCorretorSelect.value = "";
+            ownerPeriodoSelect.value = "";
+            ownerStatusSelect.value = "";
+            rerenderOwner();
+          });
+          rerenderOwner();
+        } else {
+          renderAll(activeData, false);
+        }
+
+        document.getElementById("btnExport").addEventListener("click", () => exportDashboardPDF({ corretor }));
+      } catch (err) {
+        console.error(err);
+        showError();
+      }
+    }
+
+    AOS.init({
+      duration: 400,
+      easing: "ease-out",
+      once: true,
+      offset: 20
+    });
+
+    init();
+  </script>
+</body>
+</html>
