@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -20,32 +20,95 @@
   <link rel="stylesheet" href="assets/style.css" />
   <link rel="stylesheet" href="assets/dashboard.css" />
 </head>
-<body>
+<body class="dashboard-screen">
   <header class="topbar">
     <div class="topbar-inner">
       <div class="topbar-left">
-        <img src="assets/logo.svg" alt="Conquist House" />
-        <strong>Conquist House CRM</strong>
-        <span id="corretorBadge" class="badge corretor-nome" style="background:var(--accent-glass);color:var(--accent-dark);">Ativo</span>
+        <div class="brand-mark">
+          <img src="assets/logo.svg" alt="Conquist House" />
+        </div>
+        <div class="brand-copy">
+          <span class="brand-overline">Conquist House</span>
+          <strong>CRM Comercial Premium</strong>
+        </div>
+        <div class="topbar-context">
+          <span id="corretorBadge" class="badge corretor-nome">Ativo</span>
+          <div class="context-meta">
+            <span class="context-label">Workspace</span>
+            <span>Operação, inteligência e gestão</span>
+          </div>
+        </div>
       </div>
+
       <div class="topbar-right">
-        <span id="updatedAt" class="mono" style="font-size:0.75rem;color:var(--text-secondary);"></span>
-        <a id="btnSheet" class="btn btn-sm btn-outline-accent" href="#" target="_blank" rel="noopener noreferrer" hidden><i class="ph ph-table"></i> Planilha</a>
-        <a class="btn btn-sm" href="index.html"><i class="ph ph-arrow-left"></i> Trocar Corretor</a>
-        <button id="btnExport" class="btn btn-sm btn-outline-accent" type="button"><i class="ph ph-file-pdf"></i> Exportar PDF</button>
+        <span id="updatedAt" class="updated-chip mono"></span>
+        <a id="btnSheet" class="btn btn-outline-accent" href="#" target="_blank" rel="noopener noreferrer" hidden>
+          <i class="ph ph-table"></i>
+          Planilha
+        </a>
+        <a class="btn btn-outline-accent" href="index.html">
+          <i class="ph ph-arrow-left"></i>
+          Trocar corretor
+        </a>
+        <button id="btnExport" class="btn btn-primary" type="button">
+          <i class="ph ph-file-pdf"></i>
+          Exportar PDF
+        </button>
       </div>
     </div>
   </header>
 
   <main id="pdfTarget" class="page">
-    <section id="stateBox" class="card section" data-aos="fade-up">
-      <div class="skeleton" style="height:20px;width:180px;"></div>
-      <div class="skeleton" style="height:14px;width:280px;margin-top:8px;"></div>
+    <section id="stateBox" class="card state-shell" data-aos="fade-up">
+      <div class="skeleton" style="height: 26px; width: 220px;"></div>
+      <div class="skeleton" style="height: 14px; width: min(460px, 72%);"></div>
+      <div class="skeleton" style="height: 14px; width: min(320px, 54%);"></div>
     </section>
 
-    <section id="dashboardContent" hidden>
-      <section id="ownerPanel" class="owner-panel" hidden data-aos="fade-up">
-        <h3>Painel de Gestão</h3>
+    <section id="dashboardContent" class="dashboard-stack" hidden>
+      <section class="executive-hero card" data-aos="fade-up">
+        <div>
+          <span class="eyebrow">Resumo executivo</span>
+          <div class="executive-heading">
+            <div>
+              <h1 id="heroTitle">Panorama comercial</h1>
+              <p id="heroSubtitle">Leitura consolidada da operação com foco em progresso, gargalos e oportunidades acionáveis.</p>
+            </div>
+            <div class="hero-updated">
+              <span>Última atualização</span>
+              <strong id="heroUpdatedAt">--</strong>
+            </div>
+          </div>
+          <div id="heroHighlights" class="hero-highlights"></div>
+        </div>
+
+        <aside class="hero-side">
+          <div class="hero-spotlight">
+            <span class="spotlight-label">Termômetro comercial</span>
+            <strong id="heroSpotlightValue" class="mono">--</strong>
+            <p id="heroSpotlightText">Resumo estratégico da carteira atual.</p>
+          </div>
+          <div class="hero-side-grid">
+            <article>
+              <span>Leads ativos</span>
+              <strong id="heroLeadCount" class="mono">0</strong>
+            </article>
+            <article>
+              <span>Etapa dominante</span>
+              <strong id="heroMomentum" class="mono">--</strong>
+            </article>
+          </div>
+        </aside>
+      </section>
+
+      <section id="ownerPanel" class="owner-panel section" hidden data-aos="fade-up">
+        <div class="section-head compact">
+          <div>
+            <span class="eyebrow">Gestão comercial</span>
+            <h3>Painel consolidado do time</h3>
+          </div>
+        </div>
+        <p class="section-subtitle">Filtre a operação por corretor, período ou etapa para comparar desempenho, concentração de leads e ritmo de fechamento.</p>
         <div class="owner-filters">
           <select id="ownerCorretorSelect" class="select">
             <option value="">Todos os corretores</option>
@@ -65,84 +128,176 @@
             <option value="Venda">Venda</option>
             <option value="Perdido">Perdido</option>
           </select>
-          <button id="ownerResetBtn" class="btn btn-sm btn-outline-accent" type="button">Limpar filtros</button>
+          <button id="ownerResetBtn" class="btn btn-outline-accent" type="button">Limpar filtros</button>
         </div>
         <div id="ownerSummary" class="owner-summary"></div>
       </section>
 
       <div class="kpi-grid" id="kpiGrid"></div>
 
-      <div class="layout-grid" style="margin-top:16px;">
-        <section class="card section" data-aos="fade-up">
-          <h2>Funil de Vendas</h2>
-          <div class="chart-wrap"><canvas id="funnelChart"></canvas></div>
-        </section>
-        <section class="card section" data-aos="fade-up" data-aos-delay="80">
-          <h2>Métricas de Conversão</h2>
-          <div class="progress-list" id="conversionList"></div>
-        </section>
-      </div>
+      <section id="primaryCluster" class="cluster-primary">
+        <section class="section card" data-aos="fade-up">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Performance comercial</span>
+              <h2>Funil e conversões</h2>
+              <p class="section-subtitle">Uma leitura central do avanço do pipeline, com destaque para gargalos e eficiência de passagem entre etapas.</p>
+            </div>
+            <div id="funnelSummary" class="section-chip mono">--</div>
+          </div>
 
-      <div class="layout-grid">
-        <section class="card section" data-aos="fade-up">
-          <h2>Origem dos Leads</h2>
-          <div class="chart-wrap"><canvas id="origemChart"></canvas></div>
-        </section>
-        <section class="card section" data-aos="fade-up" data-aos-delay="80">
-          <h2>Leads por Mês</h2>
-          <div class="chart-wrap"><canvas id="mesChart"></canvas></div>
-        </section>
-      </div>
+          <div class="feature-grid">
+            <div class="panel-surface">
+              <div class="panel-caption">
+                <span>Etapas do funil</span>
+                <strong id="funnelFocus">--</strong>
+              </div>
+              <div class="chart-wrap chart-wrap--tall">
+                <canvas id="funnelChart"></canvas>
+              </div>
+            </div>
 
-      <section class="card section" data-aos="fade-up">
-        <h2>Status dos Contatos</h2>
-        <div class="chart-wrap"><canvas id="statusChart"></canvas></div>
+            <div class="panel-surface">
+              <div class="panel-caption">
+                <span>Conversões críticas</span>
+                <strong id="conversionFocus">--</strong>
+              </div>
+              <div class="progress-list" id="conversionList"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="ownerRankingSection" class="section card ranking-section" hidden data-aos="fade-up">
+          <div class="section-head compact">
+            <div>
+              <span class="eyebrow">Comparativo</span>
+              <h2>Ranking de corretores</h2>
+            </div>
+          </div>
+          <p class="section-subtitle">Leitura rápida do volume, das vendas e da eficiência de conversão em toda a equipe.</p>
+          <div class="table-shell">
+            <table class="owner-ranking-table">
+              <thead>
+                <tr>
+                  <th>Corretor</th>
+                  <th>Total leads</th>
+                  <th>Vendas</th>
+                  <th>Conversão</th>
+                  <th>Ticket médio</th>
+                </tr>
+              </thead>
+              <tbody id="ownerRankingBody"></tbody>
+            </table>
+          </div>
+        </section>
       </section>
 
-      <section id="ownerRankingSection" class="card section" hidden data-aos="fade-up">
-        <h2>Ranking de Corretores</h2>
-        <div class="table-shell">
-          <table class="owner-ranking-table">
-            <thead>
-              <tr>
-                <th>Corretor</th>
-                <th>Total Leads</th>
-                <th>Vendas</th>
-                <th>Conversão (%)</th>
-                <th>Ticket Médio</th>
-              </tr>
-            </thead>
-            <tbody id="ownerRankingBody"></tbody>
-          </table>
+      <section class="analytics-grid">
+        <section class="section card" data-aos="fade-up">
+          <div class="section-head compact">
+            <div>
+              <span class="eyebrow">Aquisição</span>
+              <h2>Origem dos leads</h2>
+            </div>
+            <div id="originHighlight" class="section-chip mono">--</div>
+          </div>
+          <p class="section-subtitle">Mix de canais para entender onde a carteira está sendo abastecida e quais origens concentram mais volume.</p>
+          <div class="panel-surface">
+            <div class="chart-wrap">
+              <canvas id="origemChart"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <section class="section card" data-aos="fade-up" data-aos-delay="60">
+          <div class="section-head compact">
+            <div>
+              <span class="eyebrow">Ritmo</span>
+              <h2>Leads por mês</h2>
+            </div>
+            <div id="monthHighlight" class="section-chip mono">--</div>
+          </div>
+          <p class="section-subtitle">Evolução do volume ao longo do tempo para leitura de cadência comercial e aceleração de entrada.</p>
+          <div class="panel-surface">
+            <div class="chart-wrap">
+              <canvas id="mesChart"></canvas>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="section card" data-aos="fade-up">
+        <div class="section-head compact">
+          <div>
+            <span class="eyebrow">Qualidade de follow-up</span>
+            <h2>Status dos contatos</h2>
+          </div>
+          <div id="statusHighlight" class="section-chip mono">--</div>
+        </div>
+        <p class="section-subtitle">Distribuição das situações registradas no contato para facilitar leitura de maturidade e pendências do relacionamento comercial.</p>
+        <div class="panel-surface">
+          <div class="chart-wrap">
+            <canvas id="statusChart"></canvas>
+          </div>
         </div>
       </section>
 
-      <section class="card section" data-aos="fade-left">
-        <h2>Alertas Inteligentes</h2>
-        <div id="alertList" class="alert-list"></div>
-      </section>
+      <section class="section card leads-section" data-aos="fade-up">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Operação detalhada</span>
+            <h2>Tabela de leads</h2>
+            <p class="section-subtitle">Um CRM mais legível para varrer a carteira, aplicar filtros, identificar calor de oportunidade e localizar rapidamente os casos prioritários.</p>
+          </div>
+          <div class="table-summary">
+            <article>
+              <span>Registros visíveis</span>
+              <strong id="tableVisibleCount" class="mono">--</strong>
+            </article>
+            <article>
+              <span>Volume filtrado</span>
+              <strong id="tableVolumeValue" class="mono">--</strong>
+            </article>
+          </div>
+        </div>
 
-      <section class="card section" data-aos="fade-up">
-        <h2>Tabela de Leads</h2>
         <div class="filters">
-          <input id="searchInput" class="input" placeholder="Buscar cliente ou imóvel" />
-          <select id="statusFilter" class="select"><option value="">Status</option></select>
-          <select id="origemFilter" class="select"><option value="">Origem</option></select>
-          <select id="corretorFilter" class="select" hidden><option value="">Corretor</option></select>
-          <input id="minValor" class="input" type="number" min="0" placeholder="Valor mín." />
-          <input id="maxValor" class="input" type="number" min="0" placeholder="Valor máx." />
+          <label class="filter-field">
+            <span>Busca</span>
+            <input id="searchInput" class="input" placeholder="Buscar cliente ou imóvel" />
+          </label>
+          <label class="filter-field">
+            <span>Status</span>
+            <select id="statusFilter" class="select"><option value="">Status</option></select>
+          </label>
+          <label class="filter-field">
+            <span>Origem</span>
+            <select id="origemFilter" class="select"><option value="">Origem</option></select>
+          </label>
+          <label class="filter-field" id="corretorFilterWrap" hidden>
+            <span>Corretor</span>
+            <select id="corretorFilter" class="select"><option value="">Corretor</option></select>
+          </label>
+          <label class="filter-field">
+            <span>Valor mínimo</span>
+            <input id="minValor" class="input" type="number" min="0" placeholder="Valor mín." />
+          </label>
+          <label class="filter-field">
+            <span>Valor máximo</span>
+            <input id="maxValor" class="input" type="number" min="0" placeholder="Valor máx." />
+          </label>
         </div>
 
         <div class="table-shell">
-          <table class="table table-hover align-middle">
+          <table class="table leads-table align-middle">
             <thead>
               <tr>
                 <th data-sort="cliente">Cliente</th>
                 <th data-sort="imovel">Imóvel</th>
-                <th data-sort="dataLead">Data do Lead</th>
+                <th data-sort="dataLead">Data do lead</th>
                 <th data-sort="origemLead">Origem</th>
-                <th>Status Atual</th>
-                <th data-sort="valorImovel">Valor do Imóvel</th>
+                <th>Status atual</th>
+                <th data-sort="valorImovel">Valor do imóvel</th>
                 <th data-sort="statusContato">Situação</th>
                 <th>Ações</th>
               </tr>
@@ -152,18 +307,18 @@
         </div>
 
         <div class="pagination">
-          <div>
-            <label style="font-size:12px;color:var(--text-muted)">Itens</label>
-            <select id="perPage" class="select" style="width:80px;display:inline-block;">
+          <div class="pagination-meta">
+            <label for="perPage">Itens por página</label>
+            <select id="perPage" class="select" style="width: 96px;">
               <option value="20" selected>20</option>
               <option value="50">50</option>
               <option value="100">100</option>
             </select>
           </div>
-          <div class="topbar-right">
-            <button id="prevPage" class="btn btn-sm" type="button">Anterior</button>
+          <div class="pagination-controls">
+            <button id="prevPage" class="btn btn-outline-accent" type="button">Anterior</button>
             <span id="pageInfo" class="mono"></span>
-            <button id="nextPage" class="btn btn-sm" type="button">Próxima</button>
+            <button id="nextPage" class="btn btn-outline-accent" type="button">Próxima</button>
           </div>
         </div>
       </section>
@@ -173,7 +328,6 @@
   <script type="module">
     import { fetchCorretorData, prepararDados, temContato, temVisita, temProposta, isSim, isNao, calcularStatus } from "./js/api.js";
     import { renderCharts } from "./js/charts.js";
-    import { buildAlerts, renderAlerts } from "./js/alerts.js";
     import { createTableController } from "./js/table.js";
     import { exportDashboardPDF } from "./js/export.js";
 
@@ -196,7 +350,15 @@
     const view = params.get("view") || "broker";
     const authRaw = sessionStorage.getItem("conquist_auth");
     const corretorFilterEl = document.getElementById("corretorFilter");
+    const corretorFilterWrap = document.getElementById("corretorFilterWrap");
     const isOwnerView = view === "owner";
+
+    const fmtMoeda = (n) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+    const fmtNumber = (n) => Number(n || 0).toLocaleString("pt-BR");
+    const formatDateTime = (value) => new Date(value).toLocaleString("pt-BR", {
+      dateStyle: "short",
+      timeStyle: "short"
+    });
 
     const isAuthorized = () => {
       if (!authRaw) return false;
@@ -217,13 +379,25 @@
       window.location.href = "index.html?auth=required";
     }
 
-    const fmtMoeda = (n) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
-    const percColor = (v) => v < 20 ? "#2D6A4F" : v <= 40 ? "#9A7A2E" : "#9B2335";
-
     const stateBox = document.getElementById("stateBox");
     const content = document.getElementById("dashboardContent");
     const badge = document.getElementById("corretorBadge");
     const updatedAt = document.getElementById("updatedAt");
+    const heroUpdatedAt = document.getElementById("heroUpdatedAt");
+    const heroTitle = document.getElementById("heroTitle");
+    const heroSubtitle = document.getElementById("heroSubtitle");
+    const heroHighlights = document.getElementById("heroHighlights");
+    const heroSpotlightValue = document.getElementById("heroSpotlightValue");
+    const heroSpotlightText = document.getElementById("heroSpotlightText");
+    const heroLeadCount = document.getElementById("heroLeadCount");
+    const heroMomentum = document.getElementById("heroMomentum");
+    const primaryCluster = document.getElementById("primaryCluster");
+    const funnelSummary = document.getElementById("funnelSummary");
+    const funnelFocus = document.getElementById("funnelFocus");
+    const conversionFocus = document.getElementById("conversionFocus");
+    const originHighlight = document.getElementById("originHighlight");
+    const monthHighlight = document.getElementById("monthHighlight");
+    const statusHighlight = document.getElementById("statusHighlight");
     const kpiGrid = document.getElementById("kpiGrid");
     const ownerPanel = document.getElementById("ownerPanel");
     const ownerRankingSection = document.getElementById("ownerRankingSection");
@@ -247,13 +421,16 @@
 
     const calcKpis = (dados) => {
       const total = dados.length;
-      const contatos = dados.filter((l) => temContato(l)).length;
-      const visitas = dados.filter((l) => temVisita(l)).length;
-      const propostas = dados.filter((l) => temProposta(l)).length;
-      const vendas = dados.filter((l) => isSim(l.teveVenda));
-      const perdidos = dados.filter((l) => isNao(l.teveVenda)).length;
-      const ticket = vendas.length ? vendas.reduce((sum, l) => sum + l.valorImovel, 0) / vendas.length : 0;
+      const contatos = dados.filter((lead) => temContato(lead)).length;
+      const visitas = dados.filter((lead) => temVisita(lead)).length;
+      const propostas = dados.filter((lead) => temProposta(lead)).length;
+      const vendas = dados.filter((lead) => isSim(lead.teveVenda));
+      const perdidos = dados.filter((lead) => isNao(lead.teveVenda)).length;
+      const ticket = vendas.length ? vendas.reduce((sum, lead) => sum + lead.valorImovel, 0) / vendas.length : 0;
       const taxaPerda = total ? Number(((perdidos / total) * 100).toFixed(1)) : 0;
+      const taxaVenda = total ? Number(((vendas.length / total) * 100).toFixed(1)) : 0;
+      const carteira = dados.reduce((sum, lead) => sum + Number(lead.valorImovel || 0), 0);
+
       return {
         total,
         contatos,
@@ -262,50 +439,153 @@
         vendas: vendas.length,
         perdidos,
         ticket,
-        taxaPerda
+        taxaPerda,
+        taxaVenda,
+        carteira
       };
     };
 
-    const drawKpis = (k) => {
-      kpiGrid.innerHTML = [
-        ["Total de Leads", k.total],
-        ["Contatos Realizados", k.contatos],
-        ["Visitas Realizadas", k.visitas],
-        ["Propostas Enviadas", k.propostas],
-        ["Vendas Fechadas", k.vendas],
-        ["Leads Perdidos", k.perdidos],
-        ["Ticket Médio", fmtMoeda(k.ticket)],
-        ["Taxa de Perda", `<span style=\"color:${percColor(k.taxaPerda)}\">${k.taxaPerda.toLocaleString("pt-BR")}%</span>`]
-      ].map(([label, val], i) => `
-        <article class="card kpi" data-aos="fade-up" data-aos-delay="${i * 45}">
-          <div class="kpi-label">${label}</div>
-          <div class="kpi-value mono">${val}</div>
+    const dominantStatus = (dados) => {
+      const grouped = dados.reduce((acc, lead) => {
+        const key = calcularStatus(lead);
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      }, {});
+      const [status] = Object.entries(grouped).sort((a, b) => b[1] - a[1])[0] || ["Sem dados", 0];
+      return status;
+    };
+
+    const summarizeFunnel = (funnel) => {
+      const steps = [
+        { label: "Lead -> Contato", from: funnel.total, to: funnel.contato },
+        { label: "Contato -> Visita", from: funnel.contato, to: funnel.visita },
+        { label: "Visita -> Proposta", from: funnel.visita, to: funnel.proposta },
+        { label: "Proposta -> Venda", from: funnel.proposta, to: funnel.venda }
+      ];
+      const enriched = steps.map((step) => {
+        const rate = step.from > 0 ? Math.round((step.to / step.from) * 100) : 0;
+        return { ...step, rate };
+      });
+      return {
+        weakest: enriched.slice().sort((a, b) => a.rate - b.rate)[0] || { label: "Sem dados", rate: 0 },
+        strongest: enriched.slice().sort((a, b) => b.rate - a.rate)[0] || { label: "Sem dados", rate: 0 }
+      };
+    };
+
+    const drawHero = ({ dados, kpis, funnel, ownerMode, payload }) => {
+      const momentum = dominantStatus(dados);
+      const funnelSummaryData = summarizeFunnel(funnel);
+      const valorPotencial = kpis.carteira > 0 ? fmtMoeda(kpis.carteira) : "Sem valor";
+
+      heroTitle.textContent = ownerMode
+        ? "Panorama executivo da operação comercial"
+        : `Panorama comercial de ${corretor}`;
+
+      heroSubtitle.textContent = ownerMode
+        ? "Visão consolidada da equipe com leitura de volume, conversão, gargalos e prioridades que pedem ação da gestão."
+        : "Acompanhamento direto da carteira individual com visão clara do funil, do ritmo de atendimento e dos próximos movimentos.";
+
+      heroUpdatedAt.textContent = formatDateTime(payload.atualizadoEm);
+      heroLeadCount.textContent = fmtNumber(kpis.total);
+      heroMomentum.textContent = momentum;
+      heroSpotlightValue.textContent = `${kpis.taxaVenda.toLocaleString("pt-BR")}%`;
+      heroSpotlightText.textContent = kpis.vendas > 0
+        ? `${fmtNumber(kpis.vendas)} fechamento(s) confirmados em ${fmtNumber(kpis.total)} leads, com gargalo principal em ${funnelSummaryData.weakest.label.toLowerCase()}.`
+        : `Nenhuma venda fechada no recorte atual. O ponto mais sensível está em ${funnelSummaryData.weakest.label.toLowerCase()}.`;
+
+      heroHighlights.innerHTML = [
+        {
+          label: ownerMode ? "Carteira consolidada" : "Carteira sob gestão",
+          value: fmtNumber(kpis.total),
+          description: ownerMode ? "leads distribuídos entre a equipe no recorte atual." : "leads acompanhados no recorte selecionado."
+        },
+        {
+          label: "Volume potencial",
+          value: valorPotencial,
+          description: "soma do valor dos imóveis presentes na carteira visível."
+        },
+        {
+          label: "Melhor passagem",
+          value: `${funnelSummaryData.strongest.rate}%`,
+          description: `${funnelSummaryData.strongest.label} é a transição mais eficiente agora.`
+        }
+      ].map((item) => `
+        <article class="hero-highlight">
+          <span>${item.label}</span>
+          <strong class="mono">${item.value}</strong>
+          <p>${item.description}</p>
         </article>
       `).join("");
+    };
+
+    const drawKpis = (kpis) => {
+      const cards = [
+        { label: "Total de leads", value: fmtNumber(kpis.total), meta: "volume total da carteira ativa neste recorte.", icon: "ph-users-three", variant: "kpi--hero" },
+        { label: "Contatos realizados", value: fmtNumber(kpis.contatos), meta: "leads já abordados pelo time.", icon: "ph-chat-circle-text", variant: "kpi--compact" },
+        { label: "Visitas realizadas", value: fmtNumber(kpis.visitas), meta: "agendamentos convertidos em visita.", icon: "ph-house-line", variant: "kpi--standard" },
+        { label: "Propostas enviadas", value: fmtNumber(kpis.propostas), meta: "negociações formalizadas até aqui.", icon: "ph-scroll", variant: "kpi--standard" },
+        { label: "Vendas fechadas", value: fmtNumber(kpis.vendas), meta: "fechamentos confirmados neste painel.", icon: "ph-seal-check", variant: "kpi--standard" },
+        { label: "Leads perdidos", value: fmtNumber(kpis.perdidos), meta: "casos marcados como perdidos.", icon: "ph-warning-octagon", variant: "kpi--standard" },
+        { label: "Ticket médio", value: fmtMoeda(kpis.ticket), meta: "valor médio dos imóveis vendidos.", icon: "ph-currency-circle-dollar", variant: "kpi--standard" },
+        { label: "Taxa de perda", value: `${kpis.taxaPerda.toLocaleString("pt-BR")}%`, meta: "percentual da carteira que saiu do funil.", icon: "ph-chart-line-down", variant: "kpi--standard" }
+      ];
+
+      kpiGrid.innerHTML = cards.map((item, index) => `
+        <article class="kpi ${item.variant}" data-aos="fade-up" data-aos-delay="${index * 35}">
+          <div class="kpi__icon"><i class="ph ${item.icon}"></i></div>
+          <div class="kpi-label">${item.label}</div>
+          <div class="kpi-value mono">${item.value}</div>
+          <span class="kpi-meta">${item.meta}</span>
+        </article>
+      `).join("");
+
       AOS.refreshHard();
     };
 
-    const drawConversions = (f) => {
-      const rate = (a, b) => b > 0 ? Math.round((a / b) * 100) : 0;
+    const drawConversions = (funnel) => {
       const rows = [
-        ["Lead -> Contato", rate(f.contato, f.total)],
-        ["Contato -> Visita", rate(f.visita, f.contato)],
-        ["Visita -> Proposta", rate(f.proposta, f.visita)],
-        ["Proposta -> Venda", rate(f.venda, f.proposta)]
-      ];
-      document.getElementById("conversionList").innerHTML = rows.map(([label, val]) => `
+        ["Lead -> Contato", funnel.total, funnel.contato],
+        ["Contato -> Visita", funnel.contato, funnel.visita],
+        ["Visita -> Proposta", funnel.visita, funnel.proposta],
+        ["Proposta -> Venda", funnel.proposta, funnel.venda]
+      ].map(([label, from, to]) => {
+        const rate = from > 0 ? Math.round((to / from) * 100) : 0;
+        return { label, from, to, rate };
+      });
+
+      document.getElementById("conversionList").innerHTML = rows.map((row) => `
         <div class="progress-row">
           <div>
-            <div style="font-size:13px; font-family:var(--font-body);">${label}</div>
-            <div class="bar" aria-hidden="true"><span style="width:${val}%"></span></div>
+            <div class="progress-row-label">${row.label}</div>
+            <div class="progress-meta">${fmtNumber(row.to)} de ${fmtNumber(row.from)} oportunidades avançaram</div>
+            <div class="bar" aria-hidden="true"><span style="width:${row.rate}%"></span></div>
           </div>
-          <strong class="mono">${val}%</strong>
+          <strong class="mono">${row.rate}%</strong>
         </div>
       `).join("");
+
+      const conversionSummary = summarizeFunnel(funnel);
+      funnelSummary.textContent = `${fmtNumber(funnel.total)} leads no funil · ${fmtNumber(funnel.venda)} vendas`;
+      funnelFocus.textContent = `Gargalo: ${conversionSummary.weakest.label} (${conversionSummary.weakest.rate}%)`;
+      conversionFocus.textContent = `Melhor passagem: ${conversionSummary.strongest.label} (${conversionSummary.strongest.rate}%)`;
+    };
+
+    const drawGraphicHighlights = (metrics) => {
+      originHighlight.textContent = metrics.origin.topLabel
+        ? `${metrics.origin.topLabel} · ${fmtNumber(metrics.origin.topValue)}`
+        : "Sem dados";
+
+      monthHighlight.textContent = metrics.month.topLabel
+        ? `${metrics.month.topLabel} · ${fmtNumber(metrics.month.topValue)} leads`
+        : "Sem dados";
+
+      statusHighlight.textContent = metrics.status.topLabel
+        ? `${metrics.status.topLabel} · ${fmtNumber(metrics.status.topValue)}`
+        : "Sem dados";
     };
 
     const showError = () => {
-      stateBox.innerHTML = '<div class="error">Não foi possível carregar os dados agora. <button id="retry" class="btn" type="button">Tentar novamente</button></div>';
+      stateBox.innerHTML = '<div class="error">Não foi possível carregar os dados agora. <button id="retry" class="btn btn-outline-accent" type="button">Tentar novamente</button></div>';
       document.getElementById("retry").addEventListener("click", () => location.reload());
     };
 
@@ -317,12 +597,11 @@
         return { nome, payload, dados };
       }));
 
-      const ok = settled.filter((r) => r.status === "fulfilled").map((r) => r.value);
-      const dados = ok.flatMap((r) => r.dados);
-      const atualizadoEm = new Date().toISOString();
+      const ok = settled.filter((result) => result.status === "fulfilled").map((result) => result.value);
+      const dados = ok.flatMap((result) => result.dados);
       return {
         corretor: "Relatório Geral",
-        atualizadoEm,
+        atualizadoEm: new Date().toISOString(),
         dados
       };
     };
@@ -338,9 +617,9 @@
         if (statusSel && calcularStatus(lead) !== statusSel) return false;
         if (periodoSel > 0) {
           if (!lead.dataLead) return false;
-          const d = new Date(`${lead.dataLead}T00:00:00`);
-          if (Number.isNaN(d.getTime())) return false;
-          const diff = Math.floor((hoje - d) / (1000 * 60 * 60 * 24));
+          const date = new Date(`${lead.dataLead}T00:00:00`);
+          if (Number.isNaN(date.getTime())) return false;
+          const diff = Math.floor((hoje - date) / (1000 * 60 * 60 * 24));
           if (diff > periodoSel) return false;
         }
         return true;
@@ -348,18 +627,18 @@
     };
 
     const drawOwnerSummary = (dados) => {
-      const corretoresAtivos = new Set(dados.map((d) => d.corretor).filter(Boolean)).size;
-      const vendas = dados.filter((l) => isSim(l.teveVenda)).length;
+      const corretoresAtivos = new Set(dados.map((lead) => lead.corretor).filter(Boolean)).size;
+      const vendas = dados.filter((lead) => isSim(lead.teveVenda)).length;
       const taxaVenda = dados.length ? ((vendas / dados.length) * 100).toFixed(1) : "0.0";
-      const ticketVals = dados.filter((l) => isSim(l.teveVenda) && l.valorImovel > 0).map((l) => l.valorImovel);
+      const ticketVals = dados.filter((lead) => isSim(lead.teveVenda) && lead.valorImovel > 0).map((lead) => lead.valorImovel);
       const ticketMedio = ticketVals.length ? ticketVals.reduce((a, b) => a + b, 0) / ticketVals.length : 0;
       const mediaLeads = corretoresAtivos ? (dados.length / corretoresAtivos).toFixed(1) : "0.0";
 
       ownerSummary.innerHTML = [
-        ["Corretores Ativos", corretoresAtivos],
-        ["Leads por Corretor", mediaLeads],
-        ["Taxa Geral de Venda", `${taxaVenda}%`],
-        ["Ticket Médio Geral", fmtMoeda(ticketMedio)]
+        ["Corretores ativos", corretoresAtivos],
+        ["Leads por corretor", mediaLeads],
+        ["Taxa geral de venda", `${taxaVenda}%`],
+        ["Ticket médio geral", fmtMoeda(ticketMedio)]
       ].map(([label, value]) => `
         <article class="owner-summary-card">
           <div class="label">${label}</div>
@@ -381,20 +660,20 @@
       }, {});
 
       const rows = Object.entries(grouped)
-        .map(([nome, d]) => {
-          const conv = d.leads ? ((d.vendas / d.leads) * 100) : 0;
-          const ticket = d.vendas ? d.valorVendas / d.vendas : 0;
-          return { nome, leads: d.leads, vendas: d.vendas, conv, ticket };
+        .map(([nome, data]) => {
+          const conv = data.leads ? ((data.vendas / data.leads) * 100) : 0;
+          const ticket = data.vendas ? data.valorVendas / data.vendas : 0;
+          return { nome, leads: data.leads, vendas: data.vendas, conv, ticket };
         })
         .sort((a, b) => b.vendas - a.vendas || b.conv - a.conv);
 
-      ownerRankingBody.innerHTML = rows.map((r) => `
+      ownerRankingBody.innerHTML = rows.map((row) => `
         <tr>
-          <td>${r.nome}</td>
-          <td class="mono">${r.leads}</td>
-          <td class="mono">${r.vendas}</td>
-          <td class="mono">${r.conv.toFixed(1)}%</td>
-          <td class="mono">${fmtMoeda(r.ticket)}</td>
+          <td>${row.nome}</td>
+          <td class="mono">${fmtNumber(row.leads)}</td>
+          <td class="mono">${fmtNumber(row.vendas)}</td>
+          <td class="mono">${row.conv.toFixed(1)}%</td>
+          <td class="mono">${fmtMoeda(row.ticket)}</td>
         </tr>
       `).join("");
     };
@@ -412,8 +691,11 @@
         prev: document.getElementById("prevPage"),
         next: document.getElementById("nextPage"),
         perPage: document.getElementById("perPage"),
-        headings: [...document.querySelectorAll("thead th")]
+        headings: [...document.querySelectorAll(".leads-table thead th")],
+        visibleCount: document.getElementById("tableVisibleCount"),
+        volumeValue: document.getElementById("tableVolumeValue")
       };
+
       if (!tableController) {
         tableController = createTableController(dados, refs);
       } else {
@@ -421,13 +703,16 @@
       }
     };
 
-    const renderAll = (dados, ownerMode) => {
+    const renderAll = (dados, ownerMode, payload) => {
       const kpis = calcKpis(dados);
+      const chartMetrics = renderCharts(dados);
+
+      drawHero({ dados, kpis, funnel: chartMetrics.funnel, ownerMode, payload });
       drawKpis(kpis);
-      const funnel = renderCharts(dados);
-      drawConversions(funnel);
-      renderAlerts(document.getElementById("alertList"), buildAlerts(dados));
+      drawConversions(chartMetrics.funnel);
+      drawGraphicHighlights(chartMetrics);
       mountTable(dados, ownerMode);
+
       if (ownerMode) {
         drawOwnerSummary(dados);
         drawOwnerRanking(dados);
@@ -446,52 +731,57 @@
 
         if (isOwnerView) {
           badge.textContent = `${corretor} · Gestão`;
-          corretorFilterEl.hidden = false;
+          corretorFilterWrap.hidden = false;
           ownerPanel.hidden = false;
           ownerRankingSection.hidden = false;
+          primaryCluster.classList.remove("cluster-primary--single");
         } else {
           badge.textContent = `${corretor} · Ativo`;
-          corretorFilterEl.hidden = true;
+          corretorFilterWrap.hidden = true;
           ownerPanel.hidden = true;
           ownerRankingSection.hidden = true;
+          primaryCluster.classList.add("cluster-primary--single");
         }
 
-        updatedAt.textContent = `Atualizado: ${new Date(payload.atualizadoEm).toLocaleString("pt-BR")}`;
-
+        updatedAt.textContent = `Atualizado: ${formatDateTime(payload.atualizadoEm)}`;
         stateBox.hidden = true;
         content.hidden = false;
 
         let activeData = dados;
         if (isOwnerView) {
-          const corretores = [...new Set(dados.map((d) => d.corretor).filter(Boolean))].sort();
-          ownerCorretorSelect.innerHTML = '<option value="">Todos os corretores</option>' + corretores.map((c) => `<option value="${c}">${c}</option>`).join("");
+          const corretores = [...new Set(dados.map((lead) => lead.corretor).filter(Boolean))].sort();
+          ownerCorretorSelect.innerHTML = '<option value="">Todos os corretores</option>' + corretores.map((item) => `<option value="${item}">${item}</option>`).join("");
+
           const rerenderOwner = () => {
             activeData = applyOwnerFilters(dados);
-            renderAll(activeData, true);
+            renderAll(activeData, true, payload);
           };
-          [ownerCorretorSelect, ownerPeriodoSelect, ownerStatusSelect].forEach((el) => {
-            el.addEventListener("change", rerenderOwner);
+
+          [ownerCorretorSelect, ownerPeriodoSelect, ownerStatusSelect].forEach((element) => {
+            element.addEventListener("change", rerenderOwner);
           });
+
           ownerResetBtn.addEventListener("click", () => {
             ownerCorretorSelect.value = "";
             ownerPeriodoSelect.value = "";
             ownerStatusSelect.value = "";
             rerenderOwner();
           });
+
           rerenderOwner();
         } else {
-          renderAll(activeData, false);
+          renderAll(activeData, false, payload);
         }
 
         document.getElementById("btnExport").addEventListener("click", () => exportDashboardPDF({ corretor }));
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error(error);
         showError();
       }
     }
 
     AOS.init({
-      duration: 400,
+      duration: 450,
       easing: "ease-out",
       once: true,
       offset: 20

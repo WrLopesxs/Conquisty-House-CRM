@@ -19,35 +19,75 @@
   <link rel="stylesheet" href="assets/style.css" />
   <link rel="stylesheet" href="assets/dashboard.css" />
 </head>
-<body>
-  <main class="hero">
-    <section class="hero-shell container">
-      <div class="logo-wrap" data-aos="fade-down">
-        <img src="assets/logo.svg" alt="Conquist House" />
-        <h1>Conquist House CRM</h1>
-      </div>
-      <p class="subtitle" data-aos="fade-up" data-aos-delay="80">Selecione o corretor para abrir o painel comercial.</p>
-      <div class="broker-grid" id="brokerGrid"></div>
-      <div id="authNotice" class="mt-3 text-danger small fw-semibold"></div>
-      <p class="system-footer mono">v1.1 · Uso interno Conquist House</p>
+<body class="home-screen">
+  <main class="entry-shell">
+    <section class="entry-hero container">
+      <section class="entry-copy" data-aos="fade-right">
+        <div class="entry-brand">
+          <span class="eyebrow">Ambiente comercial restrito</span>
+          <div class="logo-wrap">
+            <img src="assets/logo.svg" alt="Conquist House" />
+            <h1>Conquisty House CRM</h1>
+          </div>
+          <p class="hero-description">
+           
+          </p>
+        </div>
+
+        <div class="entry-highlights" data-aos="fade-up" data-aos-delay="120">
+          <article class="entry-highlight">
+            <span>Experiência</span>
+            <strong>Painel comercial com leitura executiva e relatorio diário.</strong>
+          </article>
+          <article class="entry-highlight">
+            <span>Segurança</span>
+            <strong>Acesso autenticado por perfil com entrada restrita por corretor.</strong>
+          </article>
+          <article class="entry-highlight">
+            <span>Operação</span>
+            <strong>Fluxo conectado a métricas, alertas, leads e exportação em PDF.</strong>
+          </article>
+        </div>
+
+        <p class="entry-note">
+          Cada perfil abre um recorte próprio do pipeline. A gestão acompanha a operação consolidada, enquanto os corretores entram diretamente na carteira individual.
+        </p>
+      </section>
+
+      <section class="entry-access card" data-aos="fade-left">
+        <div class="access-header">
+          <span class="badge badge-soft">Acesso autenticado</span>
+          <h1>Selecione o perfil para abrir o painel comercial.</h1>
+          </div>
+
+        <div class="broker-grid" id="brokerGrid"></div>
+        <div id="authNotice" class="auth-notice" role="status" aria-live="polite"></div>
+        <p class="system-footer mono">v1.1 · uso interno Conquist House</p>
+      </section>
     </section>
   </main>
 
-  <div class="modal fade" id="passwordModal" tabindex="-1" aria-hidden="true">
+  <div class="modal fade auth-modal" id="passwordModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content" style="border:1px solid var(--border); border-radius: var(--radius-lg);">
-        <div class="modal-header" style="border-bottom:1px solid var(--border);">
-          <h5 class="modal-title">Acesso do Corretor</h5>
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <span class="eyebrow mb-0">Autenticação</span>
+            <h5 class="modal-title">Acesso do corretor</h5>
+          </div>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
         </div>
         <div class="modal-body">
-          <p class="mb-2">Digite a senha de <strong id="selectedBrokerName"></strong>.</p>
-          <input id="brokerPasswordInput" type="password" class="form-control" placeholder="Senha de acesso" />
-          <div id="passwordError" class="text-danger small mt-2 d-none">Senha inválida. Tente novamente.</div>
+          <div class="auth-modal-meta">
+            <p class="auth-modal-copy">Digite a senha vinculada ao perfil selecionado para abrir o dashboard com os dados correspondentes.</p>
+            <strong id="selectedBrokerName"></strong>
+          </div>
+          <input id="brokerPasswordInput" type="password" class="form-control input" placeholder="Senha de acesso" />
+          <div id="passwordError" class="auth-notice d-none mt-2">Senha inválida. Tente novamente.</div>
         </div>
-        <div class="modal-footer" style="border-top:1px solid var(--border);">
-          <button type="button" class="btn btn-sm" data-bs-dismiss="modal">Cancelar</button>
-          <button id="confirmPasswordBtn" type="button" class="btn btn-sm btn-primary">Entrar</button>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-accent" data-bs-dismiss="modal">Cancelar</button>
+          <button id="confirmPasswordBtn" type="button" class="btn btn-primary">Entrar no CRM</button>
         </div>
       </div>
     </div>
@@ -80,6 +120,15 @@
       josias: "010377"
     };
 
+    const roleCopy = {
+      owner: {
+        role: "Gestão"
+      },
+      broker: {
+        role: "Corretor"
+      }
+    };
+
     const authNotice = document.getElementById("authNotice");
     const search = new URLSearchParams(window.location.search);
     if (search.get("auth") === "required") {
@@ -95,16 +144,26 @@
     const passwordError = document.getElementById("passwordError");
     const confirmBtn = document.getElementById("confirmPasswordBtn");
 
-    grid.innerHTML = brokers.map((b, i) => `
-      <article class="broker-card" data-aos="fade-up" data-aos-delay="${80 + i * 40}">
-        <div class="avatar">${b.nome.slice(0, 1).toUpperCase()}</div>
-        <strong class="d-block">${b.nome}</strong>
-        ${b.role === "owner" ? '<span class="badge mt-2" style="background:var(--accent-glass);color:var(--accent-dark);">Gestão</span>' : ""}
-        <div class="d-flex gap-2 mt-3">
-          <button class="btn btn-sm btn-primary js-broker-link" data-nome="${b.nome}" data-role="${b.role}" data-gid="${b.gid || ""}" type="button">Entrar no CRM</button>
-        </div>
-      </article>
-    `).join("");
+    grid.innerHTML = brokers.map((broker, index) => {
+      const copy = roleCopy[broker.role] || roleCopy.broker;
+      return `
+        <article class="broker-card" data-aos="fade-up" data-aos-delay="${80 + (index * 35)}">
+          <div class="broker-card-top">
+            <div class="avatar">${broker.nome.slice(0, 1).toUpperCase()}</div>
+            <span class="broker-role">${copy.role}</span>
+          </div>
+          <div>
+            <strong class="broker-name d-block">${broker.nome}</strong>
+          </div>
+          <div class="broker-card-bottom">
+            <button class="btn btn-primary js-broker-link" data-nome="${broker.nome}" data-role="${broker.role}" data-gid="${broker.gid || ""}" type="button">
+              Entrar
+              <i class="ph ph-arrow-up-right"></i>
+            </button>
+          </div>
+        </article>
+      `;
+    }).join("");
 
     grid.querySelectorAll(".js-broker-link").forEach((link) => {
       link.addEventListener("click", (event) => {
@@ -149,7 +208,7 @@
     });
 
     AOS.init({
-      duration: 400,
+      duration: 450,
       easing: "ease-out",
       once: true,
       offset: 20
